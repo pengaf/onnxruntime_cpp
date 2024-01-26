@@ -9,13 +9,20 @@ void test()
 	auto ps = Ort::GetAvailableProviders();
 	auto memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
 	Ort::Env env;
-	Ort::SessionOptions sessionOptions{ nullptr };
-	//sessionOptions.AppendExecutionProvider_CUDA(OrtCUDAProviderOptions());
+	Ort::SessionOptions sessionOptions;
+	OrtCUDAProviderOptions options;
+	//options.device_id = 0;
+	//options.arena_extend_strategy = 0;
+	////options.cuda_mem_limit = (size_t)1 * 1024 * 1024 * 1024;//onnxruntime1.7.0
+	//options.gpu_mem_limit = (size_t)1 * 1024 * 1024 * 1024; //onnxruntime1.8.1, onnxruntime1.9.0
+	//options.cudnn_conv_algo_search = OrtCudnnConvAlgoSearch::OrtCudnnConvAlgoSearchExhaustive;
+	//options.do_copy_in_default_stream = 1;
+	sessionOptions.AppendExecutionProvider_CUDA(options);
 	Ort::Session session{ env, ORT_TSTR("G:/model/test.onnx"), sessionOptions };
 	Ort::Allocator alloctor(session, memory_info);
 	//session.get_inputs()[0].name
 
-	const int batch_size =32;
+	const int batch_size =1;
 	// Allocate model inputs: fill in shape and size
 
 	// Allocate model outputs: fill in shape and size
@@ -37,7 +44,7 @@ void test()
 
 	std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	for (uint32_t i = 0; i < 14000; ++i)
+	for (uint32_t i = 0; i < 1; ++i)
 	{
 		std::array<float, batch_size * 3 * 11 * 11> input{};
 		std::array<int64_t, 4> input_shape{ batch_size,3,11,11 };
